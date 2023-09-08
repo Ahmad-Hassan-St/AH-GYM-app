@@ -1,0 +1,142 @@
+{
+  "project_info": {
+    "project_number": "670102274118",
+    "project_id": "fir-connectivity-e5cd1",
+    "storage_bucket": "fir-connectivity-e5cd1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670102274118:android:4c8423465c70ef5d56ca47",
+        "android_client_info": {
+          "package_name": "com.example.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670102274118-qu4ohkdnjm5g6hlqhvpsdcnh7092943r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firebase",
+            "certificate_hash": "ee096ae3761ff258c8d3b479a1e8404bee3cb6c4"
+          }
+        },
+        {
+          "client_id": "670102274118-tn9u1k50t19q0t0te4qg490kqac23igj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7tsFmnH3ln0RkR8H18bYWH5AhGqgvCs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670102274118-onpp0buadt3guslaimekvcjc92ehpvff.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "670102274118-0ofn2m32f3mrcr01lj0ojv9atud2puet.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firstapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670102274118:android:07bc723ada161c9456ca47",
+        "android_client_info": {
+          "package_name": "com.example.firstapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670102274118-mdnaofln5s61he8tmvdp0j4lj3s7j1ib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.firstapp",
+            "certificate_hash": "ee096ae3761ff258c8d3b479a1e8404bee3cb6c4"
+          }
+        },
+        {
+          "client_id": "670102274118-tn9u1k50t19q0t0te4qg490kqac23igj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7tsFmnH3ln0RkR8H18bYWH5AhGqgvCs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670102274118-onpp0buadt3guslaimekvcjc92ehpvff.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "670102274118-0ofn2m32f3mrcr01lj0ojv9atud2puet.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firstapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670102274118:android:c2c17362e7c21d5156ca47",
+        "android_client_info": {
+          "package_name": "com.gymfitness.ahgyms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670102274118-3pn6ragctp4h4u5fe67bmlc4gq082cnn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gymfitness.ahgyms",
+            "certificate_hash": "ee096ae3761ff258c8d3b479a1e8404bee3cb6c4"
+          }
+        },
+        {
+          "client_id": "670102274118-tn9u1k50t19q0t0te4qg490kqac23igj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7tsFmnH3ln0RkR8H18bYWH5AhGqgvCs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670102274118-onpp0buadt3guslaimekvcjc92ehpvff.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "670102274118-0ofn2m32f3mrcr01lj0ojv9atud2puet.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firstapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
