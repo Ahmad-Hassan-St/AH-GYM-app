@@ -2,15 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:firstapp/services/dml_logic.dart';
-import 'package:firstapp/utils/toastMessages.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../components/image_container_widget.dart';
+import '../components/image_picker_choice.dart';
 import '../components/textfield.dart';
 import '../services/image_processing_service.dart';
-import 'admin_screen.dart'; // You'll need to import the actual service
 
 class EditProductWidget extends StatefulWidget {
   final String docId;
@@ -43,6 +42,19 @@ class _EditProductWidgetState extends State<EditProductWidget> {
     description = widget.initialDescription;
   }
 
+  imagePicker(ImageSource source) async {
+    XFile? file = await ImagePicker().pickImage(
+      source: source,
+    );
+    if (file == null) return;
+    compressImage =
+        await ImageProcessingService().compressImage(File(file.path));
+    Uint8List? imageData =
+        ImageProcessingService().imageBytes(File(compressImage.path));
+    setState(() {
+      selectedImage = MemoryImage(imageData!);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     TextEditingController titleController = TextEditingController();
@@ -78,17 +90,25 @@ class _EditProductWidgetState extends State<EditProductWidget> {
             ),
             SmallElevatedButton(
               onPressed: () async {
-                XFile? file = await ImagePicker().pickImage(
-                  source: ImageSource.gallery,
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return LowerAlertBox(
+                      alertDialogPosition: 70,
+                      cameraPicker: () async {
+                        await imagePicker(ImageSource.camera);
+                        print("camera");
+                        Navigator.of(context).pop();
+                      },
+                      galleryPicker: () async {
+                        await imagePicker(ImageSource.gallery);
+                        Navigator.of(context).pop();
+
+                        print("galler");
+                      },
+                    );
+                  },
                 );
-                if (file == null) return;
-                compressImage = await ImageProcessingService()
-                    .compressImage(File(file.path));
-                Uint8List? imageData = ImageProcessingService()
-                    .imageBytes(File(compressImage.path));
-                setState(() {
-                  selectedImage = MemoryImage(imageData!);
-                });
               },
               text: "Change Image",
             ),
@@ -133,13 +153,11 @@ class _EditProductWidgetState extends State<EditProductWidget> {
         SmallElevatedButton(
           text: "Save",
           onPressed: () async {
-            if(compressImage==null){
-
-              imageUrl=widget.oldImage;
-            }
-            else {
-              imageUrl =
-              await ImageProcessingService().getUploadImageUrl(compressImage);
+            if (compressImage == null) {
+              imageUrl = widget.oldImage;
+            } else {
+              imageUrl = await ImageProcessingService()
+                  .getUploadImageUrl(compressImage);
             }
 
             DmlLogic().updateProductData(
@@ -147,9 +165,7 @@ class _EditProductWidgetState extends State<EditProductWidget> {
                 imageUrl: imageUrl,
                 title: title,
                 description: description);
-            setState(() {
-
-            });
+            setState(() {});
             Navigator.pop(context);
           },
         ),

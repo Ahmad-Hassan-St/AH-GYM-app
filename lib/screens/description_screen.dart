@@ -7,11 +7,13 @@ import '../utils/text_style.dart';
 class description_screen extends StatefulWidget {
   final String imagePath;
   final String text;
+  final String animationIndex;
 
   const description_screen({
     Key? key,
     required this.imagePath,
     required this.text,
+    required this.animationIndex
   }) : super(key: key);
 
   @override
@@ -53,12 +55,15 @@ class _description_screenState extends State<description_screen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             SizedBox(
-               height: screenHeight * 0.306,
-               width: double.infinity,
-               child: Image(
-                image: NetworkImage(widget.imagePath),
+             Hero(
+               tag: widget.animationIndex,
+               child: SizedBox(
+                 height: screenHeight * 0.306,
+                 width: double.infinity,
+                 child: Image(
+                  image: NetworkImage(widget.imagePath),
             ),
+               ),
              ),
             Padding(
               padding: const EdgeInsets.only(top: 10.0, left: 30),

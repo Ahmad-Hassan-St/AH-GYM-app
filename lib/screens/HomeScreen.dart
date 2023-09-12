@@ -1,11 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firstapp/screens/description_screen.dart';
 import 'package:firstapp/services/AuthServices.dart';
+import 'package:firstapp/services/db_helper.dart';
 import 'package:firstapp/services/dml_logic.dart';
 import 'package:firstapp/utils/alert_box.dart';
 import 'package:firstapp/utils/text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../utils/colors.dart';
 import '../utils/progress_indicator.dart';
+import '../utils/toastMessages.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,22 +20,56 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> dataList = [];
+  DatabaseHelper databaseHelper = DatabaseHelper();
 
   @override
   Future<List<Map<String, dynamic>>> getData() async {
-    return DmlLogic().fetchData();
+    final data = await DmlLogic().fetchData();
+    // print(data);
+    return data;
+  }
+
+  dataInsert(
+      {required String image, required String title, required String docId}) async {
+  try{
+    final result = await databaseHelper.insert({
+      'docId': docId,
+
+      'image': image,
+      'title': title,
+    });
+    if (result != -1) {
+      // Data was inserted successfully
+      print('Data inserted with row ID: $result');
+      showSnackBar("add to Bookmarks");
+    } else {
+      // Data insertion failed
+      print('Failed to insert data');
+      showSnackBar("Already to Bookmarked");
+    }
+  }catch(e){
+    showSnackBar("Already to Bookmarked");
+  }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    databaseHelper.init();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     return RefreshIndicator(
       backgroundColor: kSecondaryColor,
-      onRefresh: ()async {
-       await getData();
-       setState(() {
-         
-       });
+      onRefresh: () async {
+        await getData();
+        setState(() {});
       },
       child: Scaffold(
         backgroundColor: kPrimaryColor,
@@ -44,17 +82,18 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 17.0),
               child: IconButton(
-                onPressed: (){
-                  alertDialog(context: context, yesCall: () async{
-                   await AuthServices().handleLogout(context);
-
-                  }, noCall: (){
-                    Navigator.pop(context);
-                  },
+                onPressed: () {
+                  alertDialog(
+                    context: context,
+                    yesCall: () async {
+                      await AuthServices().handleLogout(context);
+                    },
+                    noCall: () {
+                      Navigator.pop(context);
+                    },
                     heading: "Confirm Logout",
                     description: "Do you really want to Logout?",
                   );
-
                 },
                 icon: Icon(
                   Icons.logout,
@@ -102,39 +141,72 @@ class _HomeScreenState extends State<HomeScreen> {
                               horizontal: 20.0,
                             ),
                             child: InkWell(
-                              onTap: () {
+                              onTap: () async {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => description_screen(
-                                      imagePath: dataList[index]['image'],
-                                      text: dataList[index]["title"],
-                                    ),
+                                    builder: (_) =>
+                                        description_screen(
+                                          imagePath: dataList[index]['image'],
+                                          text: dataList[index]["title"],
+                                          animationIndex: "image$index",
+                                        ),
                                   ),
                                 );
+                                // like code insert into  database
+                                await dataInsert(
+                                    image: dataList[index]['image'],
+                                    title: dataList[index]["title"],
+                                    docId:dataList[index]["documentId"]);
                               },
                               child: Container(
                                 height: screenHeight * 0.25,
                                 decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(dataList[index]['image']),
-                                    fit: BoxFit.cover,
-                                  ),
                                   boxShadow: [
                                     BoxShadow(
-                                      blurRadius: 3,
+                                      blurRadius: 0.5,
                                       color: kShadowColor,
-                                      spreadRadius: 3,
+                                      spreadRadius: 1,
                                     ),
                                   ],
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 95.0, left: 26),
-                                  child: Text(
-                                    dataList[index]["title"],
-                                    style: kHomeTitle,
+                                child: Hero(
+                                  tag: 'image$index',
+                                  // Use a unique tag for each image
+
+                                  child: CachedNetworkImage(
+                                    imageUrl: dataList[index]['image'],
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        Center(
+                                            child: buildCircularProgressIndicator(
+                                                context)),
+                                    // You can customize the placeholder
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
+                                    // You can customize the error widget
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                                12),
+                                            image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 95.0,
+                                              left: 26,
+                                            ),
+                                            child: Text(
+                                              dataList[index]["title"],
+                                              style: kHomeTitle,
+                                            ),
+                                          ),
+                                        ),
                                   ),
                                 ),
                               ),

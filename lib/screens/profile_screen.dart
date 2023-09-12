@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firstapp/components/image_picker_choice.dart';
 import 'package:firstapp/services/dml_logic.dart';
 import 'package:firstapp/utils/colors.dart';
 import 'package:firstapp/utils/text_style.dart';
+import 'package:firstapp/utils/toastMessages.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/list_tile.dart';
 import '../services/image_processing_service.dart';
 import '../utils/progress_indicator.dart';
-import '../utils/text_style.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -34,30 +36,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
+
   dynamic? compressImage;
   MemoryImage? selectedImage;
-  String userEmail="";
+  String userEmail = "";
 
- Future fetchUserData() async{
-   SharedPreferences sp = await SharedPreferences.getInstance();
+  Future fetchUserData() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
     String? email = sp.getString('email');
-    userEmail=email.toString();
-    List<Map<String, dynamic>> fetchedData = await DmlLogic().fetchDataByEmail(email.toString());
+    userEmail = email.toString();
+    List<Map<String, dynamic>> fetchedData =
+        await DmlLogic().fetchDataByEmail(email.toString());
     return fetchedData;
   }
 
+  imagePicker(ImageSource source) async {
+    XFile? file = await ImagePicker().pickImage(
+      source: source,
+    );
+    if (file == null) return;
+    compressImage =
+        await ImageProcessingService().compressImage(File(file.path));
+    Uint8List? imageData =
+        ImageProcessingService().imageBytes(File(compressImage.path));
+    setState(() {
+      selectedImage = MemoryImage(imageData!);
+    });
+  }
+
+  bool isPress = false;
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    double coverHeight = MediaQuery.of(context).size.height / 4;
+    double profileHeight = MediaQuery.of(context).size.height / 6;
+    double top = coverHeight - profileHeight / 15;
+    double bottom = profileHeight / 1.6;
+
     return Scaffold(
       backgroundColor: kPrimaryColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title:  Center(
-          child: Text(
-            'User Profile',
-            style: kDescriptionHeading.copyWith(color: kSecondaryColor)
-          ),
+        title: Center(
+          child: Text('User Profile',
+              style: kDescriptionHeading.copyWith(color: kSecondaryColor)),
         ),
       ),
       body: FutureBuilder(
@@ -79,10 +103,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Stack(
                   clipBehavior: Clip.none,
+                  alignment: Alignment.center,
                   children: [
-                    const SizedBox(
-                      height: 250,
-                      width: double.infinity,
+                    Container(
+                      margin: EdgeInsets.only(bottom: bottom),
                       child: Image(
                         fit: BoxFit.cover,
                         width: double.infinity,
@@ -90,49 +114,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     Positioned(
-                      top: 200,
-
-                      left: (MediaQuery.of(context).size.width - 120) / 2,
+                      top: top,
                       child: CircleAvatar(
                         radius: 65,
                         backgroundColor: kPrimaryColor,
                         child: CircleAvatar(
                           radius: 60,
-                          backgroundImage:  selectedImage != null
-                              ? MemoryImage(selectedImage!.bytes,) as ImageProvider<Object>
-                              :  NetworkImage(dataList[0]['image']),
-                          child: const Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Icon(
-                                Icons.camera_alt,
-                                size: 40,
-                                color: Colors.white,
-                              ),
-                            ],
+                          backgroundImage: selectedImage != null
+                              ? MemoryImage(
+                                  selectedImage!.bytes,
+                                ) as ImageProvider<Object>
+                              : NetworkImage(dataList[0]['image']),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 6,
+                      left: screenWidth / 1.85,
+                      child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(50),
+                          ),
+                        ),
+                        child: IconButton(
+                          onPressed: () async {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return LowerAlertBox(
+                                    cameraPicker: () async {
+                                      await imagePicker(ImageSource.camera);
+                                      print("camera");
+                                      Navigator.of(context).pop();
+                                    },
+                                    galleryPicker: () async {
+                                      await imagePicker(ImageSource.gallery);
+                                      Navigator.of(context).pop();
+
+                                      print("gallery");
+                                    },
+                                  );
+                                });
+                          },
+                          icon: const Icon(
+                            Icons.add_a_photo,
+                            size: 20,
                           ),
                         ),
                       ),
                     ),
+
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 100.0, left: 10, right: 10),
+                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      IconButton(onPressed: ()async{
-                        XFile? file = await ImagePicker().pickImage(
-                          source: ImageSource.gallery,
-                        );
-                        if (file == null) return;
-                        compressImage = await ImageProcessingService()
-                            .compressImage(File(file.path));
-                        Uint8List? imageData = ImageProcessingService()
-                            .imageBytes(File(compressImage.path));
-                        setState(() {
-                          selectedImage = MemoryImage(imageData!);
-                        });
-                      }, icon: Icon(Icons.camera),),
                       ListTileWidget(
                         text: 'Name',
                         icon: Icons.person,
@@ -158,29 +200,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 24,
                       ),
                       ButtonWidget(
-                        buttonTitle:  const Text(
-                          "Update",
-                        ),
+                        buttonTitle: isPress
+                            ? buildCircularProgressIndicator(context)
+                            : Text(
+                                "Update",
+                              ),
                         onPressed: () async {
-                          if(compressImage!=null){
-
-                           final imageUrl = await ImageProcessingService().getUploadImageUrl(compressImage);
-                           await DmlLogic().updateUserImageByEmail(email: userEmail, imageUrl: imageUrl);
-
-                          }
+                          try {
+                            setState(() {
+                              isPress = true;
+                            });
+                            if (compressImage != null) {
+                              final imageUrl = await ImageProcessingService()
+                                  .getUploadImageUrl(compressImage);
+                              await DmlLogic().updateUserImageByEmail(
+                                  email: userEmail, imageUrl: imageUrl);
+                              showSnackBar("Data Updated successfully");
+                              setState(() {
+                                isPress = false;
+                              });
+                            }
+                          } catch (e) {}
                         },
                         backgroundColor: Colors.black,
                         borderRadius: 10,
                       )
                     ],
                   ),
-                )
+                ),
               ],
             );
           }
         },
       ),
-
     );
   }
 }
@@ -219,4 +271,4 @@ class ButtonWidget extends StatelessWidget {
     );
   }
 }
-// Hi Usa
+//=======================

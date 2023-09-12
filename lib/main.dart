@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firstapp/firebase_options.dart';
 import 'package:firstapp/screens/signup_screen.dart';
 import 'package:firstapp/screens/splash_screen.dart';
+import 'package:firstapp/services/db_helper.dart';
 import 'package:firstapp/services/notifications_services.dart';
 import 'package:firstapp/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ void main() async {
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
   );
+  DatabaseHelper().init();
   runApp(const MyApp());
 }
 

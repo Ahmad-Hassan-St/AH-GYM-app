@@ -1,4 +1,5 @@
 import 'package:firstapp/screens/HomeScreen.dart';
+import 'package:firstapp/screens/bookmark_screen.dart';
 import 'package:firstapp/screens/login_screen.dart';
 import 'package:firstapp/screens/profile_screen.dart';
 import 'package:firstapp/screens/signup_screen.dart';
@@ -24,7 +25,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   int selected = 0;
   final List<Widget> screenlist = <Widget>[
     const HomeScreen(),
-    const LoginScreen(),
+    const BookmarkScreen(),
     const ProfileScreen(),
   ];
 
@@ -75,13 +76,13 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Icon(
-                        Icons.shopping_bag_outlined,
+                        Icons.bookmark,
                         color:
                         selected == 1 ? kSecondaryColor: kIconColor,
                       ),
                     ),
                     Text(
-                      "Login",
+                      "Bookmarks",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: selected == 1

@@ -44,6 +44,7 @@ TextStyle kHomeTitle=TextStyle(
   color: kThirdColor,
   fontWeight: FontWeight.w600,
   fontSize: 24,
+  decoration: TextDecoration.none,
 );
 TextStyle kSignUp=TextStyle(
     color: kSecondaryColor,
