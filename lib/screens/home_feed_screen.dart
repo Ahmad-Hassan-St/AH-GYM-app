@@ -1,14 +1,11 @@
 import 'package:firstapp/screens/HomeScreen.dart';
 import 'package:firstapp/screens/bookmark_screen.dart';
-import 'package:firstapp/screens/login_screen.dart';
 import 'package:firstapp/screens/profile_screen.dart';
-import 'package:firstapp/screens/signup_screen.dart';
+import 'package:firstapp/services/notification_services.dart';
 import 'package:firstapp/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../services/AuthServices.dart';
 
 class HomeFeedScreen extends StatefulWidget {
   const HomeFeedScreen({Key? key}) : super(key: key);
@@ -18,8 +15,29 @@ class HomeFeedScreen extends StatefulWidget {
 }
 
 class _HomeFeedScreenState extends State<HomeFeedScreen> {
+  NotificationServices notificationServices = NotificationServices();
+
+  @override
   void initState() {
-    // TODO: implement initState
+    print('HI');
+    // Permission
+    notificationServices.requestNotificationPermission();
+
+    // Cloud Messaging
+    notificationServices.firebaseInit(context);
+
+    // Device Token Refresh
+    notificationServices.isTokenRefresh();
+    // Device Token
+    notificationServices.getDeviceToken().then((value) {
+      if (kDebugMode) {
+        print('Device Token');
+      }
+      if (kDebugMode) {
+        print(value);
+      }
+    });
+    super.initState();
   }
 
   int selected = 0;
@@ -37,22 +55,20 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    double screenHeight=MediaQuery.of(context).size.height;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      resizeToAvoidBottomInset:false,
+      resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           onTap(0);
         },
         backgroundColor: selected == 0 ? kSecondaryColor : kIconColor,
-        child:  Icon(
+        child: Icon(
           Icons.home,
           color: kPrimaryColor,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
       body: SafeArea(
         child: screenlist.elementAt(selected),
       ),
@@ -69,7 +85,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 onTap(1);
               },
               child: Ink(
-                height: screenHeight*0.07,
+                height: screenHeight * 0.07,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -77,16 +93,14 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Icon(
                         Icons.bookmark,
-                        color:
-                        selected == 1 ? kSecondaryColor: kIconColor,
+                        color: selected == 1 ? kSecondaryColor : kIconColor,
                       ),
                     ),
                     Text(
                       "Bookmarks",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: selected == 1
-                            ? kSecondaryColor: kIconColor,
+                        color: selected == 1 ? kSecondaryColor : kIconColor,
                       ),
                     ),
                   ],
@@ -95,7 +109,6 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             ),
             InkWell(
               onTap: () {
-
                 onTap(2);
               },
               child: Ink(
@@ -104,16 +117,13 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   children: [
                     Icon(
                       Icons.person,
-                      color:
-                      selected == 2 ?kSecondaryColor: kIconColor,
+                      color: selected == 2 ? kSecondaryColor : kIconColor,
                     ),
                     Text(
                       "Profile",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: selected == 2
-                            ? kSecondaryColor
-                            : kIconColor,
+                        color: selected == 2 ? kSecondaryColor : kIconColor,
                       ),
                     ),
                   ],
