@@ -69,6 +69,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     double coverHeight = MediaQuery.of(context).size.height / 4;
     double profileHeight = MediaQuery.of(context).size.height / 6;
     double top = coverHeight - profileHeight / 15;
@@ -99,136 +101,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else {
             List<Map<String, dynamic>> dataList = snapshot.data!;
             // Your Column widget with the data
-            return Column(
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(bottom: bottom),
-                      child: Image(
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        image: AssetImage("assets/images/G5.jpg"),
-                      ),
-                    ),
-                    Positioned(
-                      top: top,
-                      child: CircleAvatar(
-                        radius: 65,
-                        backgroundColor: kPrimaryColor,
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundImage: selectedImage != null
-                              ? MemoryImage(
-                                  selectedImage!.bytes,
-                                ) as ImageProvider<Object>
-                              : NetworkImage(dataList[0]['image']),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 6,
-                      left: screenWidth / 1.85,
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(50),
-                          ),
-                        ),
-                        child: IconButton(
-                          onPressed: () async {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return LowerAlertBox(
-                                    cameraPicker: () async {
-                                      await imagePicker(ImageSource.camera);
-                                      print("camera");
-                                      Navigator.of(context).pop();
-                                    },
-                                    galleryPicker: () async {
-                                      await imagePicker(ImageSource.gallery);
-                                      Navigator.of(context).pop();
-
-                                      print("gallery");
-                                    },
-                                  );
-                                });
-                          },
-                          icon: const Icon(
-                            Icons.add_a_photo,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
                     children: [
-                      ListTileWidget(
-                        text: 'Name',
-                        icon: Icons.person,
-                        leading: dataList[0]['userName'],
+                      Container(
+                        margin: EdgeInsets.only(bottom: bottom),
+                        height: screenHeight *0.3,
+                        child: Image(
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          image: AssetImage("assets/images/G5.jpg"),
+                        ),
                       ),
-                      const SizedBox(
-                        height: 14,
+                      Positioned(
+                        top: top,
+                        child: CircleAvatar(
+                          radius: 65,
+                          backgroundColor: kPrimaryColor,
+                          child: CircleAvatar(
+                            radius: 60,
+                            backgroundImage: selectedImage != null
+                                ? MemoryImage(
+                                    selectedImage!.bytes,
+                                  ) as ImageProvider<Object>
+                                : NetworkImage(dataList[0]['image']),
+                          ),
+                        ),
                       ),
-                      ListTileWidget(
-                        text: 'Email',
-                        icon: Icons.email,
-                        leading: dataList[0]['email'],
+                      Positioned(
+                        bottom: 6,
+                        left: screenWidth / 1.85,
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(50),
+                            ),
+                          ),
+                          child: IconButton(
+                            onPressed: () async {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return LowerAlertBox(
+                                      cameraPicker: () async {
+                                        await imagePicker(ImageSource.camera);
+                                        print("camera");
+                                        Navigator.of(context).pop();
+                                      },
+                                      galleryPicker: () async {
+                                        await imagePicker(ImageSource.gallery);
+                                        Navigator.of(context).pop();
+
+                                        print("gallery");
+                                      },
+                                    );
+                                  });
+                            },
+                            icon: const Icon(
+                              Icons.add_a_photo,
+                              size: 20,
+                            ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(
-                        height: 14,
-                      ),
-                      ListTileWidget(
-                        text: 'Phone number',
-                        icon: Icons.phone,
-                        leading: dataList[0]['phone'],
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      ButtonWidget(
-                        buttonTitle: isPress
-                            ? buildCircularProgressIndicator(context)
-                            : Text(
-                                "Update",
-                              ),
-                        onPressed: () async {
-                          try {
-                            setState(() {
-                              isPress = true;
-                            });
-                            if (compressImage != null) {
-                              final imageUrl = await ImageProcessingService()
-                                  .getUploadImageUrl(compressImage);
-                              await DmlLogic().updateUserImageByEmail(
-                                  email: userEmail, imageUrl: imageUrl);
-                              showSnackBar("Data Updated successfully");
-                              setState(() {
-                                isPress = false;
-                              });
-                            }
-                          } catch (e) {}
-                        },
-                        backgroundColor: Colors.black,
-                        borderRadius: 10,
-                      )
+
                     ],
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ListTileWidget(
+                          text: 'Name',
+                          icon: Icons.person,
+                          leading: dataList[0]['userName'],
+                        ),
+                        const SizedBox(
+                          height: 14,
+                        ),
+                        ListTileWidget(
+                          text: 'Email',
+                          icon: Icons.email,
+                          leading: dataList[0]['email'],
+                        ),
+                        const SizedBox(
+                          height: 14,
+                        ),
+                        ListTileWidget(
+                          text: 'Phone number',
+                          icon: Icons.phone,
+                          leading: dataList[0]['phone'],
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        ButtonWidgetProfile(
+                          buttonTitle: isPress
+                              ? buildCircularProgressIndicator(context)
+                              : Text(
+                                  "Update",
+                                ),
+                          onPressed: () async {
+                            try {
+                              setState(() {
+                                isPress = true;
+                              });
+                              if (compressImage != null) {
+                                final imageUrl = await ImageProcessingService()
+                                    .getUploadImageUrl(compressImage);
+                                await DmlLogic().updateUserImageByEmail(
+                                    email: userEmail, imageUrl: imageUrl);
+                                showSnackBar("Data Updated successfully");
+                                setState(() {
+                                  isPress = false;
+                                });
+                              }
+                            } catch (e) {}
+                          },
+                          backgroundColor: Colors.black,
+                          borderRadius: 10,
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             );
           }
         },
@@ -237,13 +242,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class ButtonWidget extends StatelessWidget {
+class ButtonWidgetProfile extends StatelessWidget {
   late Widget buttonTitle;
   late VoidCallback onPressed;
   Color? backgroundColor;
   late double? borderRadius;
 
-  ButtonWidget({
+  ButtonWidgetProfile({
     Key? key,
     required this.buttonTitle,
     required this.onPressed,

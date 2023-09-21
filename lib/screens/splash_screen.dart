@@ -3,11 +3,13 @@ import 'package:firstapp/screens/admin_screen.dart';
 import 'package:firstapp/screens/home_feed_screen.dart';
 import 'package:firstapp/screens/login_screen.dart';
 import 'package:firstapp/screens/onboard_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/notification_services.dart';
 import '../utils/colors.dart';
 
 class splash_screen extends StatefulWidget {
@@ -18,8 +20,29 @@ class splash_screen extends StatefulWidget {
 }
 
 class _splash_screenState extends State<splash_screen> {
+  NotificationServices notificationServices = NotificationServices();
+
+
+
   @override
   void initState() {
+    notificationServices.requestNotificationPermission();
+
+    // Cloud Messaging
+    notificationServices.firebaseInit(context);
+
+    // Device Token Refresh
+    notificationServices.isTokenRefresh();
+    // Device Token
+    notificationServices.getDeviceToken().then((value) {
+      if (kDebugMode) {
+        print('Device Token');
+      }
+      if (kDebugMode) {
+        print(value);
+      }
+    });
+
     super.initState();
     Timer(Duration(seconds: 2),(){
       checkIsLogin();

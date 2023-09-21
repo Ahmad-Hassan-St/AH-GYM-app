@@ -28,7 +28,7 @@ class AdminViewScreen extends StatefulWidget {
 
 class _AdminViewScreenState extends State<AdminViewScreen> {
   Future<List<Map<String, dynamic>>> getData() async {
-    return DmlLogic().fetchData();
+    return DmlLogic().fetchProductData();
   }
 
   @override
@@ -107,7 +107,7 @@ class _AdminViewScreenState extends State<AdminViewScreen> {
                       String documentId = dataList[index]['documentId'];
                       alertDialog(
                           yesCall: () async {
-                            await DmlLogic().deleteDocument(documentId);
+                            await DmlLogic().deleteProductData(documentId);
                             Navigator.pop(context);
                             setState(() {});
                           },

@@ -1,5 +1,6 @@
 import 'package:firstapp/screens/HomeScreen.dart';
 import 'package:firstapp/screens/login_screen.dart';
+import 'package:firstapp/screens/number_screen.dart';
 import 'package:firstapp/screens/signup_screen.dart';
 import 'package:firstapp/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -137,7 +138,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>  SignUp(phoneNumber: '32342342',)));
+                                      builder: (context) => NumberScreen()));
                             },
                             background_Color: Colors.white,
                             Elevation: 12,

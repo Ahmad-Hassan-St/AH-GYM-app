@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../components/image_container_widget.dart';
 import '../utils/progress_indicator.dart';
+import 'notifications_screen.dart';
 
 class AdminScreen extends StatefulWidget {
   final String? dcoumentId;
@@ -130,15 +131,34 @@ class _AdminScreenState extends State<AdminScreen> {
               const SizedBox(
                 height: 30,
               ),
-              ButtonWidget(
-                  buttonTitle: const Text("Admin View"),
-                  backgroundColor: kSecondaryColor,
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const AdminViewScreen()));
-                  }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+
+                  ButtonWidget(
+                      buttonTitle: const Text("Admin View"),
+                      width: screenWidth *0.4,
+                      backgroundColor: kSecondaryColor,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AdminViewScreen()));
+                      }),
+                  ButtonWidget(
+                      buttonTitle: const Text("Notifications"),
+                      width: screenWidth *0.4,
+                      backgroundColor: kSecondaryColor,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const NotificationScreen()));
+                      }),
+
+
+                ],
+              ),
             ],
           ),
         ),

@@ -15,31 +15,6 @@ class HomeFeedScreen extends StatefulWidget {
 }
 
 class _HomeFeedScreenState extends State<HomeFeedScreen> {
-  NotificationServices notificationServices = NotificationServices();
-
-  @override
-  void initState() {
-    print('HI');
-    // Permission
-    notificationServices.requestNotificationPermission();
-
-    // Cloud Messaging
-    notificationServices.firebaseInit(context);
-
-    // Device Token Refresh
-    notificationServices.isTokenRefresh();
-    // Device Token
-    notificationServices.getDeviceToken().then((value) {
-      if (kDebugMode) {
-        print('Device Token');
-      }
-      if (kDebugMode) {
-        print(value);
-      }
-    });
-    super.initState();
-  }
-
   int selected = 0;
   final List<Widget> screenlist = <Widget>[
     const HomeScreen(),

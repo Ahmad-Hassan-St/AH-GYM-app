@@ -6,23 +6,29 @@ class ButtonWidget extends StatelessWidget {
   late Widget buttonTitle;
   late VoidCallback onPressed;
   Color? backgroundColor;
+ late double? width;
 
   ButtonWidget(
   {super.key,
   required this.buttonTitle,
   required this.onPressed,
-  this.backgroundColor});
+  this.backgroundColor,
+  this.width=double.infinity
+  });
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox(
-      width: double.infinity,
+      width: width,
       height: screenHeight * 0.08,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
         onPressed: onPressed,
         child: buttonTitle,

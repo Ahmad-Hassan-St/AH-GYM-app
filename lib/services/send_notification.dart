@@ -6,12 +6,12 @@ class FirebaseAPIServices {
   sendPushNotifications(
       {required String title,
       required String body,
-      required String token}) async {
+      required List<String> token}) async {
     final String apiUrl = 'https://fcm.googleapis.com/fcm/send';
 
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'AAAAnAU1QEY:APA91bFmIHHtjaVKyb5j5uv2BOOsnrQaqFXD0TdqOhktQdgbyhvXKXdrhVBcKzRBwR6NM_nnL-IE7GWNNJzUSqo3i3p1rJXjShxmnJtsSs4COF5oUsuGQep-RoLl-tH8ga2pP4pnrvxP',
+      'Authorization': 'key=AAAAnAU1QEY:APA91bFmIHHtjaVKyb5j5uv2BOOsnrQaqFXD0TdqOhktQdgbyhvXKXdrhVBcKzRBwR6NM_nnL-IE7GWNNJzUSqo3i3p1rJXjShxmnJtsSs4COF5oUsuGQep-RoLl-tH8ga2pP4pnrvxP',
     };
 
     final Map<String, dynamic> data = {
@@ -27,7 +27,7 @@ class FirebaseAPIServices {
         'body': body,
         'android_channel_id': 'ahgyms'
       },
-      'to': token
+      'registration_ids': token
     };
 
     try {

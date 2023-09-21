@@ -11,12 +11,15 @@ import 'package:firstapp/screens/number_screen.dart';
 import 'package:firstapp/screens/signup_screen.dart';
 import 'package:firstapp/screens/splash_screen.dart';
 import 'package:firstapp/services/AuthServices.dart';
+import 'package:firstapp/services/dml_logic.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../components/SocailLogin.dart';
 import '../components/button.dart';
 import '../components/textfield.dart';
+import '../services/notification_services.dart';
 import '../utils/colors.dart';
 import '../utils/progress_indicator.dart';
 import '../utils/text_style.dart';
@@ -163,11 +166,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() {
                           isPress = true;
                         });
+                        //notification handling adding token in users collection and tokens
+                        NotificationServices notificationServices =
+                            NotificationServices();
+                        notificationServices.getDeviceToken().then((value) {
+                          if (kDebugMode) {
+                            print('Device Token');
+                          }
+                          if (kDebugMode) {
+                            print(value);
+                            DmlLogic().updateUserFcTokenByEmail(
+                                email: _emailController.text.trim().toString(),
+                                fcToken: value
+                            );
+                            DmlLogic().insertTokenData(token: value);
+                          }
+                        });
                         await AuthServices().signInWithAuth(
                             email: _emailController.text.trim().toString(),
                             password:
                                 _passwordController.text.trim().toString(),
                             context: context);
+
                         setState(() {
                           isPress = false;
                         });

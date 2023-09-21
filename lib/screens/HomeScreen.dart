@@ -21,50 +21,65 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> dataList = [];
   DatabaseHelper databaseHelper = DatabaseHelper();
+  bool isAddedToDatabase = false; // Initialize the state variable
 
   @override
   Future<List<Map<String, dynamic>>> getData() async {
-    final data = await DmlLogic().fetchData();
+    final data = await DmlLogic().fetchProductData();
     // print(data);
     return data;
   }
 
   dataInsert(
-      {required String image, required String title, required String docId}) async {
-  try{
-    final result = await databaseHelper.insert({
-      'docId': docId,
-
-      'image': image,
-      'title': title,
-    });
-    if (result != -1) {
-      // Data was inserted successfully
-      print('Data inserted with row ID: $result');
-      showSnackBar("add to Bookmarks");
-    } else {
-      // Data insertion failed
-      print('Failed to insert data');
+      {required String image,
+      required String title,
+      required String docId}) async {
+    try {
+      final result = await databaseHelper.insert({
+        'docId': docId,
+        'image': image,
+        'title': title,
+      });
+      if (result != -1) {
+        // Data was inserted successfully
+        print('Data inserted with row ID: $result');
+        showSnackBar("add to Bookmarks");
+      } else {
+        // Data insertion failed
+        print('Failed to insert data');
+        showSnackBar("Already to Bookmarked");
+      }
+    } catch (e) {
       showSnackBar("Already to Bookmarked");
     }
-  }catch(e){
-    showSnackBar("Already to Bookmarked");
   }
+
+  late final localData;
+
+  getLocalData() async {
+    await databaseHelper.init(); // Initialize the database helper
+
+    final data = await databaseHelper.queryAllRows();
+
+    setState(() {
+      localData = data;
+    });
+    print(localData);
+    return data;
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     databaseHelper.init();
+    getLocalData();
     super.initState();
   }
 
+  List<bool> isBookmark = [];
+
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenHeight = MediaQuery.of(context).size.height;
     return RefreshIndicator(
       backgroundColor: kSecondaryColor,
       onRefresh: () async {
@@ -132,9 +147,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const Center(child: Text('No data available.'));
                     } else {
                       List<Map<String, dynamic>> dataList = snapshot.data!;
+
                       return ListView.builder(
                         itemCount: dataList.length,
                         itemBuilder: (BuildContext context, int index) {
+                          // isBookmark[index]=false;
+                          // if (localData[index]['docId'] != null) {
+                          //   setState(() {
+                          //     isBookmark[index] = true;
+                          //   });
+                          // }
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8.0,
@@ -145,19 +168,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        description_screen(
-                                          imagePath: dataList[index]['image'],
-                                          text: dataList[index]["title"],
-                                          animationIndex: "image$index",
-                                        ),
+                                    builder: (_) => description_screen(
+                                      imagePath: dataList[index]['image'],
+                                      text: dataList[index]["title"],
+                                      animationIndex: "image$index",
+                                    ),
                                   ),
                                 );
                                 // like code insert into  database
-                                await dataInsert(
-                                    image: dataList[index]['image'],
-                                    title: dataList[index]["title"],
-                                    docId:dataList[index]["documentId"]);
                               },
                               child: Container(
                                 height: screenHeight * 0.25,
@@ -178,35 +196,68 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: CachedNetworkImage(
                                     imageUrl: dataList[index]['image'],
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) =>
-                                        Center(
-                                            child: buildCircularProgressIndicator(
-                                                context)),
+                                    placeholder: (context, url) => Center(
+                                        child: buildCircularProgressIndicator(
+                                            context)),
                                     // You can customize the placeholder
                                     errorWidget: (context, url, error) =>
                                         Icon(Icons.error),
                                     // You can customize the error widget
                                     imageBuilder: (context, imageProvider) =>
                                         Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                                12),
-                                            image: DecorationImage(
-                                              image: imageProvider,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 95.0,
-                                              left: 26,
-                                            ),
-                                            child: Text(
-                                              dataList[index]["title"],
-                                              style: kHomeTitle,
-                                            ),
-                                          ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
                                         ),
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Material(
+                                                  color: Colors.transparent,
+                                                  child: IconButton(
+                                                    onPressed: () async {
+                                                      await dataInsert(
+                                                        image: dataList[index]
+                                                            ['image'],
+                                                        title: dataList[index]
+                                                            ["title"],
+                                                        docId: dataList[index]
+                                                            ["documentId"],
+                                                      );
+                                                    },
+                                                    icon: Icon(
+                                                      // Toggle the icon based on the state
+                                                      Icons.bookmark,
+                                                      size: 40,
+                                                      color: kPrimaryColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 95.0,
+                                                left: 26,
+                                              ),
+                                              child: Text(
+                                                dataList[index]["title"],
+                                                style: kHomeTitle,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

@@ -40,7 +40,7 @@ class DmlLogic {
   }) async {
     if (_auth.currentUser != null) {
       DocumentReference productRef =
-          _fireStore.collection('products').doc(docId);
+      _fireStore.collection('products').doc(docId);
       await productRef.update({
         "image": imageUrl.toString(),
         "title": title.toString(),
@@ -52,14 +52,14 @@ class DmlLogic {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchData() async {
+  Future<List<Map<String, dynamic>>> fetchProductData() async {
     QuerySnapshot querySnapshot = await _fireStore.collection('products').get();
 
     List<Map<String, dynamic>> dataList = [];
 
     querySnapshot.docs.forEach((DocumentSnapshot document) {
       Map<String, dynamic> documentData =
-          document.data() as Map<String, dynamic>;
+      document.data() as Map<String, dynamic>;
       documentData['documentId'] =
           document.id; // Add the document ID to the map
       dataList.add(documentData);
@@ -68,10 +68,10 @@ class DmlLogic {
     return dataList;
   }
 
-  Future<void> deleteDocument(String documentId) async {
+  Future<void> deleteProductData(String documentId) async {
     try {
       final CollectionReference usersCollection =
-          FirebaseFirestore.instance.collection('products');
+      FirebaseFirestore.instance.collection('products');
 
       await usersCollection.doc(documentId).delete();
       showSnackBar("Data Deleted Successfully");
@@ -80,10 +80,9 @@ class DmlLogic {
     }
   }
 
-  insertUserData(
-      {required String phoneNumber,
-      required String userName,
-      required String email}) async {
+  insertUserData({required String phoneNumber,
+    required String userName,
+    required String email}) async {
     final serverTimestamp = FieldValue.serverTimestamp();
     CollectionReference usersCollection = _fireStore.collection('users');
     await usersCollection.add({
@@ -91,17 +90,16 @@ class DmlLogic {
       "phone": phoneNumber,
       "email": email,
       "timestamp": serverTimestamp,
+      "image":"https://firebasestorage.googleapis.com/v0/b/fir-connectivity-e5cd1.appspot.com/o/images%2F1694219020675704?alt=media&token=53f13960-3365-4efd-8b7c-289123c91d59",
     });
     showSnackBar("Successfully Registered");
-
   }
 
   Future<List<Map<String, dynamic>>> fetchDataByEmail(String email) async {
     CollectionReference usersCollection = _fireStore.collection('users');
     try {
-      QuerySnapshot querySnapshot = await usersCollection
-          .where("email", isEqualTo: email)
-          .get();
+      QuerySnapshot querySnapshot =
+      await usersCollection.where("email", isEqualTo: email).get();
 
       List<Map<String, dynamic>> dataList = [];
 
@@ -116,13 +114,14 @@ class DmlLogic {
       return [];
     }
   }
- Future<void> updateUserImageByEmail({required String email,required String imageUrl}) async {
+
+  Future<void> updateUserImageByEmail(
+      {required String email, required String imageUrl}) async {
     CollectionReference usersCollection = _fireStore.collection('users');
 
     try {
-      QuerySnapshot querySnapshot = await usersCollection
-          .where("email", isEqualTo: email)
-          .get();
+      QuerySnapshot querySnapshot =
+      await usersCollection.where("email", isEqualTo: email).get();
 
       if (querySnapshot.docs.isNotEmpty) {
         DocumentReference userDocument = querySnapshot.docs.first.reference;
@@ -136,4 +135,57 @@ class DmlLogic {
     }
   }
 
+  Future<void> updateUserFcTokenByEmail(
+      {required String email, required String fcToken}) async {
+    CollectionReference usersCollection = _fireStore.collection('users');
+
+    try {
+      QuerySnapshot querySnapshot =
+      await usersCollection.where("email", isEqualTo: email).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentReference userDocument = querySnapshot.docs.first.reference;
+
+        await userDocument.update({"token": fcToken});
+      } else {
+        print("User with email $email not found.");
+      }
+    } catch (e) {
+      print("Error updating user image: $e");
+    }
+  }
+
+  insertTokenData({required String token,
+  }) async {
+    final serverTimestamp = FieldValue.serverTimestamp();
+    CollectionReference usersCollection = _fireStore.collection('tokens');
+    await usersCollection.add({
+      "fcToken": token,
+      "timestamp": serverTimestamp,
+    });
+    showSnackBar("Token added Successfully");
+  }
+
+  Future<List<String>> fetchTokens() async {
+    List<String> tokensList = [];
+
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('tokens')
+          .get();
+
+      querySnapshot.docs.forEach((DocumentSnapshot document) {
+        Map<String, dynamic> documentData = document.data() as Map<
+            String,
+            dynamic>;
+        String fctoken = documentData['fcToken'] as String;
+        tokensList.add(fctoken);
+      });
+
+      return tokensList;
+    } catch (e) {
+      print('Error fetching data from Firestore: $e');
+      return [];
+    }
+  }
 }
